@@ -2,102 +2,92 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import { MapViewer } from './components/MapViewer';
 import { Sidebar } from './components/Sidebar';
+import { Login } from './components/Login';
 import type { MapMarker, Hero, ToolType } from './types';
+import { supabase } from './supabase';
 
 function App() {
+  const [session, setSession] = useState<any>(null);
   const [tool, setTool] = useState<ToolType>('pan');
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
   
-  // Load state from local storage or use defaults
-  const [markers, setMarkers] = useState<MapMarker[]>(() => {
-    const saved = localStorage.getItem('mu-campaign-markers');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  const [roster, setRoster] = useState<Hero[]>(() => {
-    const saved = localStorage.getItem('mu-campaign-roster');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  const [victoryPoints, setVictoryPoints] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-vp');
-    return saved ? JSON.parse(saved) : 0;
-  });
+  const [loadingData, setLoadingData] = useState(true);
 
-  const [gears, setGears] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-gears');
-    return saved ? JSON.parse(saved) : 0;
-  });
+  // States
+  const [markers, setMarkers] = useState<MapMarker[]>([]);
+  const [roster, setRoster] = useState<Hero[]>([]);
+  const [victoryPoints, setVictoryPoints] = useState<number>(0);
+  const [gears, setGears] = useState<number>(0);
+  const [brains, setBrains] = useState<number>(0);
+  const [keys, setKeys] = useState<number>(0);
+  const [heroicTokens, setHeroicTokens] = useState<number>(0);
+  const [moveTokens, setMoveTokens] = useState<number>(0);
+  const [attackTokens, setAttackTokens] = useState<number>(0);
+  const [wildTokens, setWildTokens] = useState<number>(0);
 
-  const [brains, setBrains] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-brains');
-    return saved ? JSON.parse(saved) : 0;
-  });
-
-  const [keys, setKeys] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-keys');
-    return saved ? JSON.parse(saved) : 0;
-  });
-
-  const [heroicTokens, setHeroicTokens] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-heroic');
-    return saved ? JSON.parse(saved) : 0;
-  });
-
-  const [moveTokens, setMoveTokens] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-move');
-    return saved ? JSON.parse(saved) : 0;
-  });
-
-  const [attackTokens, setAttackTokens] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-attack');
-    return saved ? JSON.parse(saved) : 0;
-  });
-
-  const [wildTokens, setWildTokens] = useState<number>(() => {
-    const saved = localStorage.getItem('mu-campaign-wild');
-    return saved ? JSON.parse(saved) : 0;
-  });
-
-  // Save state to local storage whenever it changes
+  // Load from Supabase
   useEffect(() => {
-    localStorage.setItem('mu-campaign-markers', JSON.stringify(markers));
-  }, [markers]);
+    if (!session) return;
+    
+    const loadData = async () => {
+      setLoadingData(true);
+      const { data, error } = await supabase
+        .from('campaigns')
+        .select('data')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
 
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-roster', JSON.stringify(roster));
-  }, [roster]);
+      if (data && data.data) {
+        const d = data.data as any;
+        setMarkers(d.markers || []);
+        setRoster(d.roster || []);
+        setVictoryPoints(d.victoryPoints || 0);
+        setGears(d.gears || 0);
+        setBrains(d.brains || 0);
+        setKeys(d.keys || 0);
+        setHeroicTokens(d.heroicTokens || 0);
+        setMoveTokens(d.moveTokens || 0);
+        setAttackTokens(d.attackTokens || 0);
+        setWildTokens(d.wildTokens || 0);
+      }
+      setLoadingData(false);
+    };
+    
+    loadData();
+  }, [session]);
 
+  // Save to Supabase
   useEffect(() => {
-    localStorage.setItem('mu-campaign-vp', JSON.stringify(victoryPoints));
-  }, [victoryPoints]);
+    if (!session || loadingData) return;
 
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-gears', JSON.stringify(gears));
-  }, [gears]);
+    const saveData = async () => {
+      const payload = {
+        markers, roster, victoryPoints, gears, brains, keys,
+        heroicTokens, moveTokens, attackTokens, wildTokens
+      };
+      
+      await supabase.from('campaigns').upsert({
+        user_id: session.user.id,
+        data: payload
+      });
+    };
 
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-brains', JSON.stringify(brains));
-  }, [brains]);
-
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-keys', JSON.stringify(keys));
-  }, [keys]);
-
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-heroic', JSON.stringify(heroicTokens));
-  }, [heroicTokens]);
-
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-move', JSON.stringify(moveTokens));
-  }, [moveTokens]);
-
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-attack', JSON.stringify(attackTokens));
-  }, [attackTokens]);
-
-  useEffect(() => {
-    localStorage.setItem('mu-campaign-wild', JSON.stringify(wildTokens));
-  }, [wildTokens]);
+    const timeoutId = setTimeout(saveData, 1000); // 1s debounce
+    return () => clearTimeout(timeoutId);
+  }, [session, loadingData, markers, roster, victoryPoints, gears, brains, keys, heroicTokens, moveTokens, attackTokens, wildTokens]);
 
   const handleAddMarker = (x: number, y: number) => {
     if (tool === 'pan') return;
@@ -114,9 +104,24 @@ function App() {
     setMarkers(markers.filter(m => m.id !== id));
   };
 
+  if (!session) {
+    return <Login />;
+  }
+
+  if (loadingData) {
+    return (
+      <div className="app-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ color: 'var(--text-primary)', fontSize: '1.2rem', fontWeight: 'bold' }}>
+          Carregando campanha...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-container">
       <Sidebar 
+        session={session}
         tool={tool} 
         setTool={setTool} 
         roster={roster} 

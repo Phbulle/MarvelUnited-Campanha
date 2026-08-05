@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import type { Hero, ToolType } from '../types';
-import { Hand, CircleCheck, XCircle, Plus, Trash2, Crosshair, Skull, Settings, Brain, Key, Star, ArrowUpRight, Zap, Sparkles, BookOpen, Users, SlidersHorizontal } from 'lucide-react';
+import { Hand, CircleCheck, XCircle, Plus, Trash2, Crosshair, Skull, Settings, Brain, Key, Star, ArrowUpRight, Zap, Sparkles, BookOpen, Users, SlidersHorizontal, LogOut } from 'lucide-react';
+import { supabase } from '../supabase';
 
 interface SidebarProps {
+  session: any;
   tool: ToolType;
   setTool: (t: ToolType) => void;
   roster: Hero[];
@@ -26,7 +28,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
-  tool, setTool, roster, setRoster, victoryPoints, setVictoryPoints,
+  session, tool, setTool, roster, setRoster, victoryPoints, setVictoryPoints,
   gears, setGears, brains, setBrains, keys, setKeys,
   heroicTokens, setHeroicTokens, moveTokens, setMoveTokens, attackTokens, setAttackTokens, wildTokens, setWildTokens
 }) => {
@@ -270,6 +272,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
       </div>
         </div>
+      </div>
+
+      <div className="sidebar-footer" style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={session.user.email}>
+          {session.user.email}
+        </div>
+        <button 
+          onClick={() => supabase.auth.signOut()}
+          style={{ background: 'transparent', border: 'none', color: 'var(--danger-color)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.85rem', padding: '4px' }}
+          title="Sair da Conta"
+        >
+          <LogOut size={16} /> Sair
+        </button>
       </div>
     </div>
   );
