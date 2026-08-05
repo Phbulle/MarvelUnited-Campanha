@@ -44,7 +44,7 @@ function App() {
     
     const loadData = async () => {
       setLoadingData(true);
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('campaigns')
         .select('data')
         .eq('user_id', session.user.id)

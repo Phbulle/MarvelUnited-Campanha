@@ -153,8 +153,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="resources-section" style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', background: 'rgba(0, 0, 0, 0.4)', padding: '12px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <Settings size={20} color="var(--text-secondary)" title="Engrenagens" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} title="Engrenagens">
+          <Settings size={20} color="var(--text-secondary)" />
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             <button className="icon-btn" style={{ width: '24px', height: '24px', minHeight: '24px' }} onClick={() => setGears(Math.max(0, gears - 1))}>-</button>
             <span style={{ fontWeight: 600, width: '20px', textAlign: 'center', fontSize: '0.9rem' }}>{gears}</span>
@@ -162,8 +162,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <Brain size={20} color="var(--text-secondary)" title="Cérebros" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} title="Cérebros">
+          <Brain size={20} color="var(--text-secondary)" />
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             <button className="icon-btn" style={{ width: '24px', height: '24px', minHeight: '24px' }} onClick={() => setBrains(Math.max(0, brains - 1))}>-</button>
             <span style={{ fontWeight: 600, width: '20px', textAlign: 'center', fontSize: '0.9rem' }}>{brains}</span>
@@ -171,8 +171,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <Key size={20} color="var(--text-secondary)" title="Chaves" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} title="Chaves">
+          <Key size={20} color="var(--text-secondary)" />
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             <button className="icon-btn" style={{ width: '24px', height: '24px', minHeight: '24px' }} onClick={() => setKeys(Math.max(0, keys - 1))}>-</button>
             <span style={{ fontWeight: 600, width: '20px', textAlign: 'center', fontSize: '0.9rem' }}>{keys}</span>
@@ -182,8 +182,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       <div className="bonus-tokens-section" style={{ display: 'flex', gap: '8px', justifyContent: 'space-between', background: 'rgba(0, 0, 0, 0.4)', padding: '12px', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <Star size={20} color="#ffd700" title="Heroico" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} title="Heroico">
+          <Star size={20} color="#ffd700" />
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             <button className="icon-btn" style={{ width: '24px', height: '24px', minHeight: '24px' }} onClick={() => setHeroicTokens(Math.max(0, heroicTokens - 1))}>-</button>
             <span style={{ fontWeight: 600, width: '20px', textAlign: 'center', fontSize: '0.9rem' }}>{heroicTokens}</span>
@@ -191,8 +191,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <ArrowUpRight size={20} color="var(--success-color)" title="Movimento" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} title="Movimento">
+          <ArrowUpRight size={20} color="var(--success-color)" />
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             <button className="icon-btn" style={{ width: '24px', height: '24px', minHeight: '24px' }} onClick={() => setMoveTokens(Math.max(0, moveTokens - 1))}>-</button>
             <span style={{ fontWeight: 600, width: '20px', textAlign: 'center', fontSize: '0.9rem' }}>{moveTokens}</span>
@@ -200,8 +200,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <Zap size={20} color="var(--danger-color)" title="Ataque" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} title="Ataque">
+          <Zap size={20} color="var(--danger-color)" />
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             <button className="icon-btn" style={{ width: '24px', height: '24px', minHeight: '24px' }} onClick={() => setAttackTokens(Math.max(0, attackTokens - 1))}>-</button>
             <span style={{ fontWeight: 600, width: '20px', textAlign: 'center', fontSize: '0.9rem' }}>{attackTokens}</span>
@@ -209,8 +209,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-          <Sparkles size={20} color="var(--text-primary)" title="Coringa (Wild)" />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }} title="Coringa (Wild)">
+          <Sparkles size={20} color="var(--text-primary)" />
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
             <button className="icon-btn" style={{ width: '24px', height: '24px', minHeight: '24px' }} onClick={() => setWildTokens(Math.max(0, wildTokens - 1))}>-</button>
             <span style={{ fontWeight: 600, width: '20px', textAlign: 'center', fontSize: '0.9rem' }}>{wildTokens}</span>
