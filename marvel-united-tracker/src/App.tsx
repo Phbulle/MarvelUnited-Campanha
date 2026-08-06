@@ -5,10 +5,12 @@ import { Sidebar } from './components/Sidebar';
 import { Login } from './components/Login';
 import type { MapMarker, Hero, ToolType } from './types';
 import { supabase } from './supabase';
+import { Menu, X } from 'lucide-react';
 
 function App() {
   const [session, setSession] = useState<any>(null);
   const [tool, setTool] = useState<ToolType>('pan');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -120,7 +122,18 @@ function App() {
 
   return (
     <div className="app-container">
+      <button 
+        className="mobile-menu-btn" 
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        title="Toggle Menu"
+      >
+        {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      <div className={`sidebar-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => setSidebarOpen(false)}></div>
+
       <Sidebar 
+        className={sidebarOpen ? 'open' : ''}
         session={session}
         tool={tool} 
         setTool={setTool} 

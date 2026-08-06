@@ -7,7 +7,7 @@ export interface MapMarker {
   type: MarkerType;
 }
 
-export type HeroStatus = 'available' | 'lost';
+export type HeroStatus = 'available' | 'resting' | 'lost';
 
 export interface Hero {
   id: string;

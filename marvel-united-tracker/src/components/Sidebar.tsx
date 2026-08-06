@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Hero, ToolType } from '../types';
-import { Hand, CircleCheck, XCircle, Plus, Trash2, Crosshair, Skull, Settings, Brain, Key, Star, ArrowUpRight, Zap, Sparkles, BookOpen, Users, SlidersHorizontal, LogOut } from 'lucide-react';
+import { Hand, CircleCheck, XCircle, Plus, Trash2, Crosshair, Skull, Settings, Brain, Key, Star, ArrowUpRight, Zap, Sparkles, BookOpen, Users, SlidersHorizontal, LogOut, Moon, Sun } from 'lucide-react';
 import { supabase } from '../supabase';
 
 interface SidebarProps {
@@ -25,12 +25,13 @@ interface SidebarProps {
   setAttackTokens: (val: number) => void;
   wildTokens: number;
   setWildTokens: (val: number) => void;
+  className?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ 
   session, tool, setTool, roster, setRoster, victoryPoints, setVictoryPoints,
   gears, setGears, brains, setBrains, keys, setKeys,
-  heroicTokens, setHeroicTokens, moveTokens, setMoveTokens, attackTokens, setAttackTokens, wildTokens, setWildTokens
+  heroicTokens, setHeroicTokens, moveTokens, setMoveTokens, attackTokens, setAttackTokens, wildTokens, setWildTokens, className
 }) => {
   const [newHeroName, setNewHeroName] = useState('');
   const [activeTab, setActiveTab] = useState<'tools' | 'roster'>('tools');
@@ -60,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="sidebar glass-panel">
+    <div className={`sidebar glass-panel ${className || ''}`}>
       <div className="sidebar-header">
         <h2>Marvel United</h2>
         <p>Campaign Tracker</p>
@@ -238,37 +239,100 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </form>
 
         <div className="roster-list">
-          {roster.map(hero => (
-            <div key={hero.id} className="hero-item">
-              <div className="hero-item-content">
-                <div className={`hero-status ${hero.status === 'lost' ? 'lost' : ''}`} />
-                <span style={{ textDecoration: hero.status === 'lost' ? 'line-through' : 'none', opacity: hero.status === 'lost' ? 0.5 : 1 }}>
-                  {hero.name}
-                </span>
-              </div>
-              <div className="hero-actions">
-                <button 
-                  className="icon-btn" 
-                  onClick={() => toggleHeroStatus(hero.id)}
-                  title={hero.status === 'available' ? 'Mark as Lost' : 'Recover Hero'}
-                >
-                  {hero.status === 'available' ? <Skull size={16} /> : <Crosshair size={16} />}
-                </button>
-                <button 
-                  className="icon-btn danger" 
-                  onClick={() => removeHero(hero.id)}
-                  title="Remove from roster"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </div>
-          ))}
           {roster.length === 0 && (
             <div style={{ textAlign: 'center', color: 'var(--text-secondary)', marginTop: '20px', fontSize: '0.9rem' }}>
               Your roster is empty. <br/> Add unlocked heroes above!
             </div>
           )}
+
+          {(['available', 'resting', 'lost'] as const).map(status => {
+            const sectionHeroes = roster.filter(h => h.status === status);
+            if (sectionHeroes.length === 0) return null;
+            
+            const titles: Record<string, string> = {
+              available: 'Disponíveis',
+              resting: 'Descansando',
+              lost: 'Derrotados / Perdidos'
+            };
+
+            return (
+              <div key={status} style={{ marginBottom: '16px' }}>
+                <div style={{ 
+                  fontSize: '0.8rem', 
+                  textTransform: 'uppercase', 
+                  color: 'var(--text-secondary)',
+                  marginBottom: '8px',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span>{titles[status]} ({sectionHeroes.length})</span>
+                  {status === 'resting' && (
+                    <button 
+                      className="icon-btn" 
+                      style={{ height: '24px', width: 'auto', padding: '0 8px', fontSize: '0.75rem', borderRadius: '4px', background: 'rgba(255, 255, 255, 0.1)' }}
+                      onClick={() => {
+                        setRoster(roster.map(h => h.status === 'resting' ? { ...h, status: 'available' } : h));
+                      }}
+                      title="Nova Rodada (Recuperar Todos)"
+                    >
+                      Nova Rodada
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {sectionHeroes.map(hero => (
+                    <div key={hero.id} className="hero-item">
+                      <div className="hero-item-content">
+                        <div className={`hero-status ${hero.status}`} />
+                        <span style={{ 
+                          textDecoration: hero.status === 'lost' ? 'line-through' : 'none', 
+                          opacity: hero.status === 'lost' ? 0.5 : hero.status === 'resting' ? 0.8 : 1 
+                        }}>
+                          {hero.name}
+                        </span>
+                      </div>
+                      <div className="hero-actions">
+                        {hero.status === 'available' && (
+                          <button 
+                            className="icon-btn" 
+                            onClick={() => setRoster(roster.map(h => h.id === hero.id ? { ...h, status: 'resting' } : h))}
+                            title="Usar e Descansar"
+                          >
+                            <Moon size={16} />
+                          </button>
+                        )}
+                        {hero.status === 'resting' && (
+                          <button 
+                            className="icon-btn" 
+                            onClick={() => setRoster(roster.map(h => h.id === hero.id ? { ...h, status: 'available' } : h))}
+                            title="Recuperar Herói"
+                          >
+                            <Sun size={16} />
+                          </button>
+                        )}
+                        <button 
+                          className="icon-btn" 
+                          onClick={() => setRoster(roster.map(h => h.id === hero.id ? { ...h, status: hero.status === 'lost' ? 'available' : 'lost' } : h))}
+                          title={hero.status === 'lost' ? 'Reviver' : 'Marcar como Derrotado'}
+                        >
+                          {hero.status === 'lost' ? <Crosshair size={16} /> : <Skull size={16} />}
+                        </button>
+                        <button 
+                          className="icon-btn danger" 
+                          onClick={() => removeHero(hero.id)}
+                          title="Remover do Roster"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
         </div>

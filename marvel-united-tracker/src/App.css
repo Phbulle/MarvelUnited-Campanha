@@ -76,6 +76,7 @@
   border-bottom: none;
   border-right: none;
   background: rgba(11, 12, 16, 0.85);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .sidebar-header h2 {
@@ -206,6 +207,10 @@
   background: var(--danger-color);
 }
 
+.hero-status.resting {
+  background: #ffaa00;
+}
+
 .hero-actions {
   display: flex;
   gap: 8px;
@@ -251,4 +256,61 @@
   font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
+}
+
+/* Mobile Toggle Button & Overlay */
+.mobile-menu-btn {
+  display: none;
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  background: var(--panel-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(8px);
+  color: var(--text-primary);
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 90;
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: flex;
+  }
+  .sidebar-overlay {
+    display: block;
+  }
+  .sidebar {
+    position: absolute;
+    left: -350px;
+    top: 0;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  }
+  .sidebar.open {
+    left: 0;
+  }
 }
