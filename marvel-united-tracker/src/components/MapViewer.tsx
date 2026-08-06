@@ -15,6 +15,8 @@ export const MapViewer: React.FC<MapViewerProps> = ({ markers, tool, onAddMarker
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [initialPinchDist, setInitialPinchDist] = useState<number | null>(null);
+  const [initialPinchScale, setInitialPinchScale] = useState<number>(1);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -69,6 +71,66 @@ export const MapViewer: React.FC<MapViewerProps> = ({ markers, tool, onAddMarker
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      if (tool === 'pan') {
+        setIsDragging(true);
+        setDragStart({ x: e.touches[0].clientX - position.x, y: e.touches[0].clientY - position.y });
+      }
+    } else if (e.touches.length === 2) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+      
+      setInitialPinchDist(dist);
+      setInitialPinchScale(scale);
+      setIsDragging(false);
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && e.touches.length === 1) {
+      setPosition({
+        x: e.touches[0].clientX - dragStart.x,
+        y: e.touches[0].clientY - dragStart.y,
+      });
+    } else if (e.touches.length === 2 && initialPinchDist !== null) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const dist = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
+      
+      const zoomFactor = dist / initialPinchDist;
+      let newScale = initialPinchScale * zoomFactor;
+      
+      if (newScale < 0.05) newScale = 0.05;
+      if (newScale > 5) newScale = 5;
+      
+      const container = containerRef.current;
+      if (container) {
+        const rect = container.getBoundingClientRect();
+        const centerX = (touch1.clientX + touch2.clientX) / 2 - rect.left;
+        const centerY = (touch1.clientY + touch2.clientY) / 2 - rect.top;
+
+        const xs = (centerX - position.x) / scale;
+        const ys = (centerY - position.y) / scale;
+
+        setScale(newScale);
+        setPosition({
+          x: centerX - xs * newScale,
+          y: centerY - ys * newScale,
+        });
+        
+        setInitialPinchDist(dist);
+        setInitialPinchScale(newScale);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setInitialPinchDist(null);
+  };
+
   const handleClick = (e: ReactMouseEvent) => {
     // If we just finished dragging, don't place a marker
     if (tool === 'pan') return;
@@ -96,6 +158,10 @@ export const MapViewer: React.FC<MapViewerProps> = ({ markers, tool, onAddMarker
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      onTouchCancel={handleTouchEnd}
       onClick={handleClick}
       onContextMenu={(e) => e.preventDefault()}
       style={{ cursor: tool === 'pan' ? (isDragging ? 'grabbing' : 'grab') : 'crosshair' }}

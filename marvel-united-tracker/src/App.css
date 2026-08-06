@@ -19,6 +19,7 @@
   cursor: grab;
   position: relative;
   transform-origin: 0 0;
+  touch-action: none;
 }
 
 .map-container:active {
