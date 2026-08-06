@@ -48,14 +48,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     setNewHeroName('');
   };
 
-  const toggleHeroStatus = (id: string) => {
-    setRoster(roster.map(hero => 
-      hero.id === id 
-        ? { ...hero, status: hero.status === 'available' ? 'lost' : 'available' } 
-        : hero
-    ));
-  };
-
   const removeHero = (id: string) => {
     setRoster(roster.filter(hero => hero.id !== id));
   };
